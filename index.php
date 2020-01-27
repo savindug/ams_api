@@ -1,34 +1,53 @@
 <?php
+  // Headers
+  header('Access-Control-Allow-Origin: *');
+  header('Content-Type: application/json');
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, DELETE, PUT');
+  include_once '../config/Database.php';
+  include_once '../models/Leave.php';
 
-$method = $_SERVER['REQUEST_METHOD'];
-// echo $method;
+  // Instantiate DB & connect
+  $database = new Database();
+  $db = $database->connect();
 
-$request_uri = $_SERVER['REQUEST_URI'];
-// echo $request_uri;
+  // Instantiate blog Leave object
+  $Leave = new Leave($db);
 
-$tables = ['posts'];
-$url = rtrim($request_uri, '/');
-$url = filter_var($request_uri, FILTER_SANITIZE_URL);
-$url = explode('/', $url);
- print_r($url);
+  // Blog Leave query
+  $result = $Leave->read();
+  // Get row count
+  $num = $result->rowCount();
 
- header("Location: api/Leave/read.php");
+  // Check if any Leaves
+  if($num > 0) {
+    // Leave array
+    $Leave_arr = array();
+    // $Leave_arr['data'] = array();
 
-// $tableName = (string) $url[3];
-// // print_r($tableName);
-// if ($url[4] != null) {
-//     $id = (int) $url[4];
-// } else {
-//     $id = null;
-// }
+    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+      // extract($row);
 
-// if (in_array($tableName, $tables)) {
-//     // Include that api route
-//     include_once './classes/Database.php';
-//     include_once './api/posts.php';
-// } else {
-//     echo json_encode(['message' => 'Table does not exists']);
-// }
+      // $Leave_item = array(
+      //   'userId' => $userId,
+      //   'UserName' => $UserName,
+      //   'Gender' => $Gender,
+      //   'deptName' => $deptName,
+      //   'branchName' => $branchName
+      // );
+
+      // // Push to "data"
+      // array_push($Leave_arr, $Leave_item);
+      // // array_push($Leave_arr['data'], $Leave_item);
+
+      $Leave_arr[] = $row;
+    }
+
+    // Turn to JSON & output
+    echo json_encode($Leave_arr);
+
+  } else {
+    // No Leaves
+    echo json_encode(
+      array('message' => 'No Leaves Found')
+    );
+  }
