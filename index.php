@@ -15,7 +15,7 @@ $url = filter_var($request_uri, FILTER_SANITIZE_URL);
 $url = explode('/', $url);
  print_r($url);
 
- //header("Location: api/Leave/read.php");
+ header("Location: api/Leave/read.php");
 
 // $tableName = (string) $url[3];
 // // print_r($tableName);
